@@ -28,7 +28,7 @@ class LineMessage
 
     conn.post do |req|
       req.url path
-      req.headers['Content-Type'] = 'application/json'
+      req.headers['Content-Type'] = 'application/json; charset=UTF-8'
       req.headers['X-Line-ChannelID'] =  ENV['LINE_CHANNEL_ID']
       req.headers['X-Line-ChannelSecret'] = ENV['LINE_CHANNEL_SECRET']
       req.headers['X-Line-Trusted-User-With-ACL'] = ENV['LINE_CHANNEL_MID']
