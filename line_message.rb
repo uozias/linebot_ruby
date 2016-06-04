@@ -5,7 +5,7 @@ require 'json'
 Dotenv.load
 
 class LineMessage
-  def send(from)
+  def send(from, content = {text: "hi!"})
     from ||= ENV["TARGET_MID"]
 
     conn = Faraday.new(:url => 'https://trialbot-api.line.me') do |faraday|
@@ -14,16 +14,15 @@ class LineMessage
       faraday.adapter  Faraday.default_adapter  # make requests with Net::HTTP
     end
 
+    content2 = build_content(content)
+    return if content2.nil?
+
     path = '/v1/events'
     body = {
         to: [from],
         toChannel: 1383378250,
         eventType: "138311608800106203",
-        content: {
-            contentType: 1,
-            toType: 1,
-            text:"Hello, Jose!"
-        }
+        content: content2
     }.to_json
 
     conn.post do |req|
@@ -33,6 +32,45 @@ class LineMessage
       req.headers['X-Line-ChannelSecret'] = ENV['LINE_CHANNEL_SECRET']
       req.headers['X-Line-Trusted-User-With-ACL'] = ENV['LINE_CHANNEL_MID']
       req.body = body
+    end
+  end
+
+  def build_content(content)
+    case content
+      when String
+        {
+            contentType: 1,
+            toType: 1,
+            text: content
+        }
+      when Hash
+        if content.has_key? :text
+          {
+              contentType: 1,
+              toType: 1,
+              text: content[:text]
+          }
+        end
+        if content.has_key? :image_url
+          {
+              "contentType":2,
+              "toType":1,
+              "originalContentUrl": content[:image_url],
+              "previewImageUrl": content[:preview_url]
+          }
+        end
+        if content.has_key? :sticker_id
+          {
+              "contentType":8,
+              "toType":1,
+              "contentMetadata":{
+                  "STKID": content[:sticker_id],
+                  "STKPKGID": content[:sticker_package_id],
+              }
+          }
+        end
+      else
+        nil
     end
   end
 end
