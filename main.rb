@@ -2,7 +2,8 @@ require 'sinatra'
 require './line_message'
 
 get '/' do
-  LineMessage.new.send
+  from = params['from']
+  LineMessage.new.send(from)
   'OK'
 end
 

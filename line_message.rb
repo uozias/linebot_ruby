@@ -5,7 +5,9 @@ require 'json'
 Dotenv.load
 
 class LineMessage
-  def send
+  def send(from)
+    from ||= ENV["TARGET_MID"]
+
     conn = Faraday.new(:url => 'https://trialbot-api.line.me') do |faraday|
       faraday.request  :url_encoded             # form-encode POST params
       faraday.response :logger                  # log requests to STDOUT
@@ -14,7 +16,7 @@ class LineMessage
 
     path = '/v1/events'
     body = {
-        to: [ENV["TARGET_MID"]],
+        to: [from],
         toChannel: 1383378250,
         eventType: "138311608800106203",
         content: {
