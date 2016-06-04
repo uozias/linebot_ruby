@@ -3,8 +3,7 @@ require './line_message'
 require 'logger'
 require 'json'
 
-logdir = File.dirname(__FILE__) + "/log"
-logger = ::Logger.new(logdir + '/app.log')
+logger = ::Logger.new('./log/app.log')
 
 post '/' do
   from = nil
@@ -13,7 +12,7 @@ post '/' do
   from = params['result'][0]['from'] if params['result'].is_a? Array
   result = LineMessage.new.send(from)
   logger.debug "response: " + result.body.to_s
-  logger.debug "from: " + from
+  logger.debug "from: " + from.to_s
   'OK ' + from.to_s
 end
 
