@@ -2,8 +2,11 @@ require 'sinatra'
 require './line_message'
 require 'logger'
 require 'json'
+require 'dotenv'
 
-logger = ::Logger.new('./log/app.log')
+Dotenv.load
+
+logger = ::Logger.new(ENV["BASE_PATH"].to_s + 'log/app.log')
 
 post '/' do
   from = nil
